@@ -23,10 +23,12 @@ const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
 })
 
-const onCellEditComplete = (event) => {
-    let { data, newValue, field } = event;
+const editingRows = ref([]);
 
-    console.log({data, newValue, field})
+const onRowEditSave = (event) => {
+    let { newData, index } = event;
+
+    console.log({newData, index})
     // Things to do
         // Send update request to mocks
         // Refetch Glossary to update the table
@@ -45,13 +47,14 @@ getGlossary()
         :value="glossary" 
         :rows="10" 
         :rowsPerPageOptions="[5, 10, 20, 50]"
-        editMode="cell" 
+        v-model:editingRows="editingRows" 
+        editMode="row"
         tableStyle="min-width: 50rem" 
         v-model:filters="filters" 
         stripedRows 
         showGridlines 
         paginator 
-        @cell-edit-complete="onCellEditComplete"
+        @row-edit-save="onRowEditSave"
     >
         <template #header>
             <div class="flex justify-content-end">
@@ -63,14 +66,22 @@ getGlossary()
                 </IconField>
             </div>
         </template>
-        <Column field="term" header="Term"></Column>
+        <Column field="term" header="Term">
+            <template #body="{ data, field }">
+                {{ data[field] }}
+            </template>
+            <template #editor="{ data, field }">
+                <InputText v-model="data[field]" />
+            </template>
+        </Column>
         <Column field="definition" header="Definition">
             <template #body="{ data, field }">
                 {{ data[field] }}
             </template>
             <template #editor="{ data, field }">
-                <Textarea v-model="data[field]" autofocus cols="90"/>
+                <Textarea v-model="data[field]" cols="100" />
             </template>
         </Column>
+        <Column :rowEditor="true" style="width: 10%; min-width: 8rem" bodyStyle="text-align:center"></Column>
     </DataTable>
 </template>
