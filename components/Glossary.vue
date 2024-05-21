@@ -23,6 +23,7 @@ getGlossary()
 <template>
     Glossary!
     <div v-for="entry in glossary" >
-        {{ entry.term }} - {{ entry.definition }}
+        <InputText type="text" v-model="entry.term" disabled /><Textarea v-model="entry.definition" cols="40" autoResize disabled />
+        <Button icon="pi pi-pencil" />
     </div>
 </template>
