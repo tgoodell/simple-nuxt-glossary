@@ -27,6 +27,9 @@ const onCellEditComplete = (event) => {
     let { data, newValue, field } = event;
 
     console.log({data, newValue, field})
+    // Things to do
+        // Send update request to mocks
+        // Refetch Glossary to update the table
 };
 
 getGlossary()

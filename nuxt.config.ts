@@ -14,7 +14,7 @@ export default defineNuxtConfig({
       unstyled: true
     },
     components: {
-      include: ['Button', 'Textarea', 'InputText', 'DataTable', 'Column', 'IconField', 'InputIcon']
+      include: ['Button', 'Textarea', 'InputText', 'DataTable', 'Column', 'IconField', 'InputIcon', 'Card']
     },
     importPT: { as: 'Aura', from: '~/presets/aura' }
   },
