@@ -2,6 +2,8 @@
 // For a detailed explanation about using middlewares, visit:
 // https://mocks-server.org/docs/usage/variants/middlewares
 
+const definitions = require('../fixtures/definitions')
+
 module.exports = [
   {
     id: "add-headers", //route id
@@ -26,4 +28,45 @@ module.exports = [
       },
     ],
   },
+  {
+    id: "get-terms", // route id
+    url: "/api/glossary", // url in express format
+    method: "GET", // HTTP method
+    variants: [
+        {
+            id: "success", // variant id
+            type: "json", // variant handler id
+            options: {
+                status: 200, // status to send
+                body: definitions, // body to send
+            },
+        },
+    ]
+  },
+  {
+    id: "edit-term", // route id
+    url: "/api/glossary", // url in express format
+    method: "POST", // HTTP method
+    variants: [
+        {
+            id: "success", // variant id
+            type: "middleware", // variant handler id
+            options: {
+              middleware: (req, res, next, core) => { // Search for the user and remove it
+                const termIndex = definitions.findIndex((termDef) => termDef.id == req.query.id)
+                if (termIndex >= 0) {
+                  definitions.splice(termIndex, req.query.data);
+                  console.log(termIndex)
+                  res.status(204);
+                  res.send();
+                } else {
+                  console.log(req.query)
+                  res.status(404);
+                  res.send();
+                }
+              },
+            },
+        },
+    ]
+  }
 ];

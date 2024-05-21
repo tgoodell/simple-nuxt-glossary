@@ -25,13 +25,23 @@ const filters = ref({
 
 const editingRows = ref([]);
 
-const onRowEditSave = (event) => {
+const onRowEditSave = async (event) => {
     let { newData, index } = event;
 
     console.log({newData, index})
     // Things to do
         // Send update request to mocks
         // Refetch Glossary to update the table
+
+    const data = await $fetch('http://localhost:3100/api/glossary', {
+        method: 'POST',
+        query: {
+            id: index,
+            data: newData,
+        }
+    })
+
+    console.log(data)
 };
 
 getGlossary()
@@ -79,9 +89,9 @@ getGlossary()
                 {{ data[field] }}
             </template>
             <template #editor="{ data, field }">
-                <Textarea v-model="data[field]" cols="100" />
+                <Textarea v-model="data[field]" class="w-full" />
             </template>
         </Column>
-        <Column :rowEditor="true" style="width: 10%; min-width: 8rem" bodyStyle="text-align:center"></Column>
+        <Column :rowEditor="true" bodyStyle="text-align:center"></Column>
     </DataTable>
 </template>
