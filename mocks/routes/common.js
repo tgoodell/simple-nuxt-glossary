@@ -55,12 +55,10 @@ module.exports = [
               middleware: (req, res, next, core) => { // Search for the user and remove it
                 const termIndex = definitions.findIndex((termDef) => termDef.id == req.query.id)
                 if (termIndex >= 0) {
-                  definitions.splice(termIndex, req.query.data);
-                  console.log(termIndex)
+                  definitions[termIndex] = req.query
                   res.status(204);
                   res.send();
                 } else {
-                  console.log(req.query)
                   res.status(404);
                   res.send();
                 }

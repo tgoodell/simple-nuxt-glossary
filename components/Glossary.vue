@@ -37,11 +37,12 @@ const onRowEditSave = async (event) => {
         method: 'POST',
         query: {
             id: index,
-            data: newData,
+            term: newData.term,
+            definition: newData.definition
         }
     })
 
-    console.log(data)
+    getGlossary()
 };
 
 getGlossary()
