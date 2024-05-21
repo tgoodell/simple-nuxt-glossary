@@ -66,5 +66,45 @@ module.exports = [
             },
         },
     ]
+  },
+  {
+    id: "add-term", // route id
+    url: "/api/add", // url in express format
+    method: "POST", // HTTP method
+    variants: [
+        {
+            id: "success", // variant id
+            type: "middleware", // variant handler id
+            options: {
+              middleware: (req, res, next, core) => { // Search for the user and remove it
+                // Find the next id to use
+                const lastEntry = definitions.reduce(
+                  (prev, current) => {
+                    return prev.id > current.id ? prev : current
+                  }
+                );
+                const nextId = lastEntry.id + 1
+
+                // Add new entry to definitions
+                definitions[nextId] = {
+                  id: nextId,
+                  term: req.query.term,
+                  definition: req.query.definition
+                }
+                console.log(definitions[nextId])
+                res.status(204);
+                res.send();
+                // if (termIndex >= 0) {
+                //   definitions[termIndex] = req.query
+                //   res.status(204);
+                //   res.send();
+                // } else {
+                //   res.status(404);
+                //   res.send();
+                // }
+              },
+            },
+        },
+    ]
   }
 ];
