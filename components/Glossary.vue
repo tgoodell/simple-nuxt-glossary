@@ -23,6 +23,12 @@ const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
 })
 
+const onCellEditComplete = (event) => {
+    let { data, newValue, field } = event;
+
+    console.log({data, newValue, field})
+};
+
 getGlossary()
 </script>
 
@@ -32,7 +38,18 @@ getGlossary()
         <InputText type="text" v-model="entry.term" disabled /><Textarea v-model="entry.definition" cols="40" autoResize disabled />
         <Button icon="pi pi-pencil" />
     </div> -->
-    <DataTable :value="glossary" v-model:filters="filters" stripedRows showGridlines tableStyle="min-width: 50rem" paginator :rows="10" :rowsPerPageOptions="[5, 10, 20, 50]">
+    <DataTable 
+        :value="glossary" 
+        :rows="10" 
+        :rowsPerPageOptions="[5, 10, 20, 50]"
+        editMode="cell" 
+        tableStyle="min-width: 50rem" 
+        v-model:filters="filters" 
+        stripedRows 
+        showGridlines 
+        paginator 
+        @cell-edit-complete="onCellEditComplete"
+    >
         <template #header>
             <div class="flex justify-content-end">
                 <IconField iconPosition="left">
@@ -44,6 +61,13 @@ getGlossary()
             </div>
         </template>
         <Column field="term" header="Term"></Column>
-        <Column field="definition" header="Definition"></Column>
+        <Column field="definition" header="Definition">
+            <template #body="{ data, field }">
+                {{ data[field] }}
+            </template>
+            <template #editor="{ data, field }">
+                <Textarea v-model="data[field]" autofocus cols="90"/>
+            </template>
+        </Column>
     </DataTable>
 </template>
