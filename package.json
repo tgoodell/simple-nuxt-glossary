@@ -8,7 +8,7 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
-    "mocks" : "mocks-server"
+    "mocks": "mocks-server"
   },
   "dependencies": {
     "nuxt": "^3.11.2",
@@ -19,6 +19,7 @@
   "packageManager": "pnpm@9.1.1+sha512.14e915759c11f77eac07faba4d019c193ec8637229e62ec99eefb7cf3c3b75c64447882b7c485142451ee3a6b408059cdfb7b7fa0341b975f12d0f7629c71195",
   "devDependencies": {
     "@mocks-server/main": "^4.1.0",
+    "@nuxtjs/tailwindcss": "^6.12.0",
     "nuxt-primevue": "^0.3.1",
     "primeicons": "^7.0.0"
   }
