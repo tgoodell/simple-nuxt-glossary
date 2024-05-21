@@ -11,7 +11,12 @@ import { FilterMatchMode } from 'primevue/api';
         // $fetch it
         // Probably best to just use a Data Table to render terms + definitions
 
-const glossary = ref()        
+const glossary = ref()
+const editingRows = ref([]);
+const popupVisible = ref(false)
+const newTerm = ref('')
+const newDefinition = ref('')
+
 async function getGlossary() {
   const data = await $fetch('http://localhost:3100/api/glossary', {
     method: 'GET',
@@ -22,8 +27,6 @@ async function getGlossary() {
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
 })
-
-const editingRows = ref([]);
 
 const onRowEditSave = async (event) => {
     let { newData, index } = event;
@@ -76,6 +79,9 @@ getGlossary()
                     <InputText v-model="filters['global'].value" placeholder="Keyword Search" />
                 </IconField>
             </div>
+            <div class="flex justify-content-end">
+                <Button icon="pi pi-plus" severity="info" @click="popupVisible=true" />
+            </div>
         </template>
         <Column field="term" header="Term">
             <template #body="{ data, field }">
@@ -95,4 +101,15 @@ getGlossary()
         </Column>
         <Column :rowEditor="true" bodyStyle="text-align:center"></Column>
     </DataTable>
+    <Dialog v-model:visible="popupVisible" modal header="Add Entry" :style="{ width: '25rem' }">
+        <span class="text-surface-600 dark:text-surface-0/70 block mb-5">Submit a new term and definition pair.</span>
+        <label for="term">Term</label>
+        <InputText v-model="newTerm" id="term" />
+        <label for="term">Definition</label>
+        <Textarea v-model="newDefinition" id="definition" />
+        <div class="flex justify-end gap-2">
+            <Button type="button" label="Cancel" severity="secondary" @click="popupVisible=false"></Button>
+            <Button type="button" label="Save" @click="popupVisible=false"></Button>
+        </div>
+    </Dialog>
 </template>
