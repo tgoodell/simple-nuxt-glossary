@@ -17,11 +17,26 @@ const popupVisible = ref(false)
 const newTerm = ref('')
 const newDefinition = ref('')
 
+// A function to fetch the pre-existing glossary
 async function getGlossary() {
   const data = await $fetch('http://localhost:3100/api/glossary', {
     method: 'GET',
   })
   glossary.value = data
+}
+
+// A function to add a new term given its id, term, and definition
+// If the given id belongs to a current entry, that entry will be edited
+// Otherwise, the server will create a new entry at the next possible index
+async function addTerm(id: number, term: string, definition: string) {
+    await $fetch('http://localhost:3100/api/glossary', {
+        method: 'POST',
+        query: {
+            id: id,
+            term: term,
+            definition: definition
+        }
+    })
 }
 
 const filters = ref({
@@ -36,15 +51,7 @@ const onRowEditSave = async (event) => {
         // Send update request to mocks
         // Refetch Glossary to update the table
 
-    const data = await $fetch('http://localhost:3100/api/glossary', {
-        method: 'POST',
-        query: {
-            id: index,
-            term: newData.term,
-            definition: newData.definition
-        }
-    })
-
+    addTerm(index, newData.term, newData.definition)
     getGlossary()
 };
 
@@ -109,7 +116,7 @@ getGlossary()
         <Textarea v-model="newDefinition" id="definition" />
         <div class="flex justify-end gap-2">
             <Button type="button" label="Cancel" severity="secondary" @click="popupVisible=false"></Button>
-            <Button type="button" label="Save" @click="popupVisible=false"></Button>
+            <Button type="button" label="Save" @click="addTerm(-2, newTerm, newDefinition)"></Button>
         </div>
     </Dialog>
 </template>
