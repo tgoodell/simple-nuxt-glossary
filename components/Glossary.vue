@@ -124,7 +124,7 @@ onMounted(() => {
 <template>
     <div class="container mx-auto w-1/2 max-lg:w-auto">
         <!-- Search + Add Term Bar -->
-        <Toolbar class="mt-3 rounded-none sticky top-0">
+        <Toolbar class="mt-3 rounded-none fixed top-0 w-1/2">
             <template #center>
                 <IconField iconPosition="left">
                     <InputIcon>
@@ -134,12 +134,12 @@ onMounted(() => {
                 </IconField>
             </template>
             <template #end>
-                <Button icon="pi pi-plus" severity="info" @click="popupVisible=true" />
+                <Button icon="pi pi-plus" class="text-slate-100 bg-sky-400 hover:bg-sky-600" @click="popupVisible=true" />
             </template>
         </Toolbar>
 
         <!-- Links to Letter Section Toolbar -->
-        <Toolbar class="border-0 mb-4">
+        <Toolbar class="border-0 mb-4 mt-20">
             <template #center>
                 <span v-for="(entries, letter) in glossary">
                     <a :href="'#' + letter" v-if="entries.length > 0" class="mx-1 text-sky-600 hover:text-sky-900 underline">{{ letter }}</a>
@@ -172,23 +172,24 @@ onMounted(() => {
             </div>
 
             <!-- Sidebar with List of Term Links -->
-            <div class="col-span-1">
-                <h2 class="text-xl">Terms</h2>
-                <div v-for="(entries, letter) in glossary" class="my-2">
-                    <div v-if="entries.length > 0">
-                        <h3>{{ letter }}</h3>
-                        <ul>
-                            <li v-for="entry in entries">
-                                <a :href="'#' + slugify(entry.term)" class="text-sky-600 hover:text-sky-900 underline">
-                                    {{ entry.term }}
-                                </a>
-                            </li>
-                        </ul>
+            <div class="col-span-1 ml-4">
+                <div class="sticky top-20 overflow-y-scroll h-screen">
+                    <h2 class="text-xl border-b-2">Terms</h2>
+                    <div v-for="(entries, letter) in glossary" class="my-2">
+                        <div v-if="entries.length > 0">
+                            <h3>{{ letter }}</h3>
+                            <ul class="leading-6">
+                                <li v-for="entry in entries">
+                                    <a :href="'#' + slugify(entry.term)" class="text-sky-600 hover:text-sky-900 underline">
+                                        {{ entry.term }}
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-        
         <!-- Add Term Popup -->
         <Dialog v-model:visible="popupVisible" modal header="Add Entry" :style="{ width: '25rem' }">
             <span class="text-surface-600 dark:text-surface-0/70 block mb-5">Submit a new term and definition pair.</span>
