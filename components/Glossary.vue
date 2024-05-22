@@ -123,6 +123,7 @@ onMounted(() => {
 
 <template>
     <div class="container mx-auto w-1/2 max-lg:w-auto">
+        <!-- Search + Add Term Bar -->
         <Toolbar class="mt-3 rounded-none sticky top-0">
             <template #center>
                 <IconField iconPosition="left">
@@ -136,6 +137,8 @@ onMounted(() => {
                 <Button icon="pi pi-plus" severity="info" @click="popupVisible=true" />
             </template>
         </Toolbar>
+
+        <!-- Links to Letter Section Toolbar -->
         <Toolbar class="border-0 mb-4">
             <template #center>
                 <span v-for="(entries, letter) in glossary">
@@ -144,7 +147,10 @@ onMounted(() => {
                 </span>
             </template>
         </Toolbar>
+
+        <!-- Content Body -->
         <div class="grid grid-cols-4">
+            <!-- List of Terms and Definitions, Organized by Letter -->
             <div class="col-span-3">
                 <div v-for="(entries, letter) in glossary" >
                     <!-- Only show letter section if there are Glossary Entries that begin with that letter -->
@@ -164,6 +170,8 @@ onMounted(() => {
                     </div>
                 </div>
             </div>
+
+            <!-- Sidebar with List of Term Links -->
             <div class="col-span-1">
                 <h2 class="text-xl">Terms</h2>
                 <div v-for="(entries, letter) in glossary" class="my-2">
@@ -181,6 +189,7 @@ onMounted(() => {
             </div>
         </div>
         
+        <!-- Add Term Popup -->
         <Dialog v-model:visible="popupVisible" modal header="Add Entry" :style="{ width: '25rem' }">
             <span class="text-surface-600 dark:text-surface-0/70 block mb-5">Submit a new term and definition pair.</span>
             <label for="term">Term</label>
@@ -193,54 +202,4 @@ onMounted(() => {
             </div>
         </Dialog>
     </div>
-
-
-    <!-- <div v-for="entry in glossary" >
-        <InputText type="text" v-model="entry.term" disabled /><Textarea v-model="entry.definition" cols="40" autoResize disabled />
-        <Button icon="pi pi-pencil" />
-    </div> -->
-    <!-- <DataTable 
-        :value="glossary" 
-        :rows="10" 
-        :rowsPerPageOptions="[5, 10, 20, 50]"
-        v-model:editingRows="editingRows" 
-        editMode="row"
-        tableStyle="min-width: 50rem" 
-        v-model:filters="filters" 
-        stripedRows 
-        showGridlines 
-        paginator 
-        @row-edit-save="onRowEditSave"
-    >
-        <template #header>
-            <div class="flex justify-content-end">
-                <IconField iconPosition="left">
-                    <InputIcon>
-                        <i class="pi pi-search" />
-                    </InputIcon>
-                    <InputText v-model="filters['global'].value" placeholder="Keyword Search" />
-                </IconField>
-            </div>
-            <div class="flex justify-content-end">
-                <Button icon="pi pi-plus" severity="info" @click="popupVisible=true" />
-            </div>
-        </template>
-        <Column field="term" header="Term">
-            <template #body="{ data, field }">
-                {{ data[field] }}
-            </template>
-            <template #editor="{ data, field }">
-                <InputText v-model="data[field]" />
-            </template>
-        </Column>
-        <Column field="definition" header="Definition">
-            <template #body="{ data, field }">
-                {{ data[field] }}
-            </template>
-            <template #editor="{ data, field }">
-                <Textarea v-model="data[field]" class="w-full" />
-            </template>
-        </Column>
-        <Column :rowEditor="true" bodyStyle="text-align:center"></Column>
-    </DataTable>-->
 </template>
