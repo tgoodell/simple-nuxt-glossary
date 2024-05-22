@@ -99,5 +99,85 @@ module.exports = [
     "id": 19,
     "term": "Brake Cables/Housing",
     "definition": "The cables and housing that connect the brake levers to the brakes, allowing the rider to apply braking force."
+},
+{
+id: 20,
+    term: "Engine",
+    definition: "The internal combustion engine is the heart of the vehicle, converting fuel into mechanical energy to power the car."
+},
+{
+id: 21,
+    term: "Transmission",
+    definition: "The transmission transfers power from the engine to the wheels, allowing the car to change speed and direction."
+},
+{
+id: 22,
+    term: "Suspension System",
+    definition: "The suspension system includes shocks, struts, and springs, providing a smooth ride by absorbing bumps and vibrations."
+},
+{
+id: 23,
+    term: "Brake System",
+    definition: "The brake system uses friction to slow or stop the car, ensuring safe deceleration and stopping."
+},
+{
+id: 24,
+    term: "Exhaust System",
+    definition: "The exhaust system removes harmful gases from the engine and reduces noise pollution."
+},
+{
+    id: 25,
+    term: "Fuel System",
+    definition: "The fuel system stores and delivers fuel to the engine, ensuring proper combustion."
+},
+{
+    id: 26,
+    term: "Ignition System",
+    definition: "The ignition system starts the engine by generating sparks at the spark plugs, igniting the fuel-air mixture."
+},
+{
+    id: 27,
+    term: "Electrical System",
+    definition: "The electrical system powers various components of the car, including lights, electronics, and the ignition."
+},
+{
+    id: 28,
+    term: "Cooling System",
+    definition: "The cooling system regulates engine temperature, preventing overheating by circulating coolant."
+},
+{
+    id: 29,
+    term: "Steering System",
+    definition: "The steering system allows the driver to control the direction of the vehicle, typically using a steering wheel."
+},
+{
+    id: 30,
+    term: "Air Conditioning System",
+    definition: "The air conditioning system cools and dehumidifies air entering the cabin, enhancing driver and passenger comfort."
+},
+{
+    id: 31,
+    term: "Fuel Injection System",
+    definition: "The fuel injection system delivers fuel into the engine cylinders with precision, optimizing fuel efficiency and performance."
+},
+{
+    id: 32,
+    term: "Catalytic Converter",
+    definition: "The catalytic converter reduces emissions by converting harmful gases like carbon monoxide and nitrogen oxides into less harmful substances."
+},
+{
+    id: 33,
+    term: "Radiator",
+    definition: "The radiator dissipates heat from the engine coolant, helping to regulate engine temperature."
+},
+{
+    id: 34,
+    term: "Drive Shaft",
+    definition: "The drive shaft transfers power from the transmission to the wheels, enabling movement."
+},
+{
+    id: 35,
+    term: "Starter Motor",
+    definition: "The starter motor initiates engine startup by turning the engine crankshaft until combustion begins."
 }
 ];

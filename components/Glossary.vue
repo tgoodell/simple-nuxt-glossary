@@ -173,8 +173,8 @@ onMounted(() => {
 
             <!-- Sidebar with List of Term Links -->
             <div class="col-span-1 ml-4">
-                <div class="sticky top-20 overflow-y-scroll h-screen">
-                    <h2 class="text-xl border-b-2">Terms</h2>
+                <h2 class="text-xl border-b-2 sticky top-20">Terms</h2>
+                <ScrollPanel class="sticky top-25 h-80-vh">
                     <div v-for="(entries, letter) in glossary" class="my-2">
                         <div v-if="entries.length > 0">
                             <h3>{{ letter }}</h3>
@@ -187,7 +187,7 @@ onMounted(() => {
                             </ul>
                         </div>
                     </div>
-                </div>
+                </ScrollPanel>
             </div>
         </div>
         <!-- Add Term Popup -->
