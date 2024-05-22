@@ -173,7 +173,7 @@ onMounted(() => {
 
             <!-- Sidebar with List of Term Links -->
             <div class="col-span-1 ml-4">
-                <h2 class="text-xl border-b-2 sticky top-20">Terms</h2>
+                <h2 class="text-xl border-b-2 sticky top-20 font-sans font-medium">Terms</h2>
                 <ScrollPanel class="sticky top-25 h-80-vh">
                     <div v-for="(entries, letter) in glossary" class="my-2">
                         <div v-if="entries.length > 0">
@@ -190,16 +190,18 @@ onMounted(() => {
                 </ScrollPanel>
             </div>
         </div>
+        
         <!-- Add Term Popup -->
+        <!-- Since Primevue Dialog does not allow us pass a class, we must use an inline style -->
         <Dialog v-model:visible="popupVisible" modal header="Add Entry" :style="{ width: '25rem' }">
             <span class="text-surface-600 dark:text-surface-0/70 block mb-5">Submit a new term and definition pair.</span>
-            <label for="term">Term</label>
-            <InputText v-model="newTerm" id="term" />
-            <label for="term">Definition</label>
-            <Textarea v-model="newDefinition" id="definition" />
-            <div class="flex justify-end gap-2">
-                <Button type="button" label="Cancel" severity="secondary" @click="popupVisible=false"></Button>
-                <Button type="button" label="Save" @click="addTerm(newTerm, newDefinition)"></Button>
+            <label for="term" class="block text-sm font-medium leading-6 text-gray-900">Term</label>
+            <InputText v-model="newTerm" id="term" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 mb-2" />
+            <label for="term" class="block text-sm font-medium leading-6 text-gray-900">Definition</label>
+            <Textarea v-model="newDefinition" id="definition" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 mb-2" />
+            <div class="flex justify-end gap-2 mt-4">
+                <Button type="button" label="Cancel" class="bg-stone-100 hover:bg-stone-200" @click="popupVisible=false"></Button>
+                <Button type="button" label="Save" class="bg-sky-100 hover:bg-sky-200" @click="addTerm(newTerm, newDefinition)"></Button>
             </div>
         </Dialog>
     </div>
