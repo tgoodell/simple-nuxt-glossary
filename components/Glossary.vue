@@ -17,6 +17,7 @@ const editingRows = ref([]);
 const popupVisible = ref(false)
 const newTerm = ref('')
 const newDefinition = ref('')
+const baseSortedTerms = ref<Record<string, GlossaryEntry[]>>({})
 
 interface GlossaryEntry {
     id: number
@@ -29,17 +30,36 @@ function fullUrl(suffix: string) {
     return config.public.apiBase + suffix
 }
 
+// A function that will populate baseSortedTerms with keys A-Z
+function generateSortedTermsScaffold(): void {
+    for (let i = 65; i <= 90; i++) {
+        const letter = String.fromCharCode(i);
+        baseSortedTerms.value[letter] = [];
+    }
+}
+
 // A function to fetch the pre-existing glossary
+// Will also alphabetize and group together the terms
 async function getGlossary() {
-  const data: GlossaryEntry[] = await $fetch(fullUrl('api/glossary'), {
-    method: 'GET',
-  })
-  // Transform data so it is in alphabetical order by term
-  glossary.value = data.sort((first: GlossaryEntry, second: GlossaryEntry) => {
-    if (first.term < second.term) return -1
-    if (first.term > second.term) return 1
-    return 0
-  })
+    const data: GlossaryEntry[] = await $fetch(fullUrl('api/glossary'), {
+        method: 'GET',
+    })
+    // Step 1: Sort all terms
+    const orderedData = ref()
+    // Transform data so it is in alphabetical order by term
+    orderedData.value = data.sort((first: GlossaryEntry, second: GlossaryEntry) => {
+        if (first.term < second.term) return -1
+        if (first.term > second.term) return 1
+        return 0
+    })
+
+    // Step 2: Group all terms together by starting letter
+    const sortedTerms = ref(JSON.parse(JSON.stringify(baseSortedTerms.value)))
+    for (const entry of orderedData.value) {
+        sortedTerms.value[entry.term.charAt(0)].push(entry)
+    }
+
+    glossary.value = sortedTerms.value
 }
 
 // A function to add a new term given its id, term, and definition
@@ -89,16 +109,38 @@ const onRowEditSave = async (event) => {
 };
 
 getGlossary()
+generateSortedTermsScaffold()
 </script>
 
 <template>
     Glossary!
+    <div class="container px-4">
+        <div v-for="(entries, letter) in glossary">
+            <!-- Only show letter section if there are Glossary Entries that begin with that letter -->
+            <div v-if="entries.length > 0">
+                <h2 class="text-4xl font-medium" :id="letter">{{ letter }}</h2>
+                <DataView :value="entries">
+                    <template #list="slotProps">
+                        <div class="grid grid-nogutter bg-slate-50">
+                            <div v-for="(item, index) in slotProps.items" :key="index" class="col-12 leading-9">
+                                <h2 class="text-4xl font-medium">{{ item.term }}</h2>
+                                <p>{{ item.definition }}</p>
+                            </div>
+                        </div>
+                    </template>
+                </DataView>
+            </div>
+        </div>
+        
+    </div>
+
+
     <!-- <div v-for="entry in glossary" >
         <InputText type="text" v-model="entry.term" disabled /><Textarea v-model="entry.definition" cols="40" autoResize disabled />
         <Button icon="pi pi-pencil" />
     </div> -->
     {{config.public.apiBase }}
-    <DataTable 
+    <!-- <DataTable 
         :value="glossary" 
         :rows="10" 
         :rowsPerPageOptions="[5, 10, 20, 50]"
@@ -152,5 +194,5 @@ getGlossary()
             <Button type="button" label="Cancel" severity="secondary" @click="popupVisible=false"></Button>
             <Button type="button" label="Save" @click="addTerm(newTerm, newDefinition)"></Button>
         </div>
-    </Dialog>
+    </Dialog> -->
 </template>
