@@ -11,15 +11,21 @@ import { FilterMatchMode } from 'primevue/api';
         // $fetch it
         // Probably best to just use a Data Table to render terms + definitions
 
+const config = useRuntimeConfig()
 const glossary = ref()
 const editingRows = ref([]);
 const popupVisible = ref(false)
 const newTerm = ref('')
 const newDefinition = ref('')
 
+// A function that returns the full URL to use in an API call
+function fullUrl(suffix: string) {
+    return config.public.apiBase + suffix
+}
+
 // A function to fetch the pre-existing glossary
 async function getGlossary() {
-  const data = await $fetch('http://localhost:3100/api/glossary', {
+  const data = await $fetch(fullUrl('api/glossary'), {
     method: 'GET',
   })
   glossary.value = data
@@ -29,7 +35,7 @@ async function getGlossary() {
 // If the given id belongs to a current entry, that entry will be edited
 // Otherwise, it will return a 404 status
 async function editTerm(id: number, term: string, definition: string) {
-    await $fetch('http://localhost:3100/api/glossary', {
+    await $fetch(fullUrl('api/glossary'), {
         method: 'POST',
         body: {
             id: id,
@@ -42,7 +48,7 @@ async function editTerm(id: number, term: string, definition: string) {
 // A function add a new term + definition, given a term and definition
 // The backend will handle assigning an id
 async function addTerm(term: string, definition: string) {
-    await $fetch('http://localhost:3100/api/add', {
+    await $fetch(fullUrl('api/add'), {
         method: 'POST',
         body: {
             term: term,
@@ -80,6 +86,7 @@ getGlossary()
         <InputText type="text" v-model="entry.term" disabled /><Textarea v-model="entry.definition" cols="40" autoResize disabled />
         <Button icon="pi pi-pencil" />
     </div> -->
+    {{config.public.apiBase }}
     <DataTable 
         :value="glossary" 
         :rows="10" 
