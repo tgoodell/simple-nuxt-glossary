@@ -134,6 +134,7 @@ onMounted(() => {
                 </IconField>
             </template>
             <template #end>
+                <Button icon="pi pi-file-arrow-up" class="text-slate-100 bg-sky-600 hover:bg-sky-900 mr-1" @click="" />
                 <Button icon="pi pi-plus" class="text-slate-100 bg-sky-600 hover:bg-sky-900" @click="popupVisible=true" />
             </template>
         </Toolbar>
