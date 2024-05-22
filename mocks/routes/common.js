@@ -6,29 +6,6 @@ const definitions = require('../fixtures/definitions')
 
 module.exports = [
   {
-    id: "add-headers", //route id
-    url: "*", // url in express format
-    method: ["GET", "POST", "PUT", "PATCH"], // HTTP methods
-    variants: [
-      {
-        id: "enabled", // variant id
-        type: "middleware", // variant handler id
-        options: {
-          // Express middleware to execute
-          middleware: (_req, res, next, core) => {
-            res.set("x-mocks-server-example", "some-value");
-            core.logger.info("Custom header added by route variant middleware");
-            next();
-          },
-        },
-      },
-      {
-        id: "disabled", // variant id
-        disabled: true,
-      },
-    ],
-  },
-  {
     id: "get-terms", // route id
     url: "/api/glossary", // url in express format
     method: "GET", // HTTP method
@@ -53,10 +30,10 @@ module.exports = [
             type: "middleware", // variant handler id
             options: {
               middleware: (req, res, next, core) => { // Search for the user and remove it
-                const termIndex = definitions.findIndex((termDef) => termDef.id == req.query.id)
+                const termIndex = definitions.findIndex((termDef) => termDef.id == req.body.id)
                 if (termIndex >= 0) {
-                  definitions[termIndex] = req.query
-                  res.status(204);
+                  definitions[termIndex] = req.body
+                  res.status(200); // Okay
                   res.send();
                 } else {
                   res.status(404);
@@ -88,20 +65,12 @@ module.exports = [
                 // Add new entry to definitions
                 definitions[nextId] = {
                   id: nextId,
-                  term: req.query.term,
-                  definition: req.query.definition
+                  term: req.body.term,
+                  definition: req.body.definition
                 }
                 console.log(definitions[nextId])
-                res.status(204);
+                res.status(201); // Created
                 res.send();
-                // if (termIndex >= 0) {
-                //   definitions[termIndex] = req.query
-                //   res.status(204);
-                //   res.send();
-                // } else {
-                //   res.status(404);
-                //   res.send();
-                // }
               },
             },
         },

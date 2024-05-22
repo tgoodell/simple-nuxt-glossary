@@ -31,7 +31,7 @@ async function getGlossary() {
 async function editTerm(id: number, term: string, definition: string) {
     await $fetch('http://localhost:3100/api/glossary', {
         method: 'POST',
-        query: {
+        body: {
             id: id,
             term: term,
             definition: definition
@@ -44,7 +44,7 @@ async function editTerm(id: number, term: string, definition: string) {
 async function addTerm(term: string, definition: string) {
     await $fetch('http://localhost:3100/api/add', {
         method: 'POST',
-        query: {
+        body: {
             term: term,
             definition: definition
         }
