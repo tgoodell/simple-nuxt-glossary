@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { FilterMatchMode } from 'primevue/api';
 import { onMounted } from 'vue';
 // Glossary with Definitions and Terms
     // Features:
@@ -14,12 +13,12 @@ import { onMounted } from 'vue';
 
 const config = useRuntimeConfig()
 const glossary = ref()
-const editingRows = ref([]);
+const searchedGlossary = ref()
 const popupVisible = ref(false)
 const newTerm = ref('')
 const newDefinition = ref('')
 const baseSortedTerms = ref<Record<string, GlossaryEntry[]>>({})
-const prevSectionExists = ref(false)
+const searchQuery = ref('')
 
 interface GlossaryEntry {
     id: number
@@ -67,6 +66,7 @@ async function getGlossary() {
     }
 
     glossary.value = sortedTerms.value
+    searchedGlossary.value = sortedTerms.value
 }
 
 // A function to add a new term given its id, term, and definition
@@ -99,21 +99,12 @@ async function addTerm(term: string, definition: string) {
     getGlossary()
 }
 
-const filters = ref({
-    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+// When searchQuery changes, update the searchedGlossary
+watch(searchQuery, async() => {
+    console.log(searchQuery.value)
+    searchedGlossary.value = glossary.value
+    console.log(glossary.value)
 })
-
-const onRowEditSave = async (event) => {
-    let { newData, index } = event;
-
-    console.log({newData, index})
-    // Things to do
-        // Send update request to mocks
-        // Refetch Glossary to update the table
-
-    editTerm(index, newData.term, newData.definition)
-    getGlossary()
-};
 
 onMounted(() => {
     getGlossary()
@@ -130,7 +121,7 @@ onMounted(() => {
                     <InputIcon>
                         <i class="pi pi-search" />
                     </InputIcon>
-                    <InputText placeholder="Search" />
+                    <InputText placeholder="Search" v-model="searchQuery" />
                 </IconField>
             </template>
             <template #end>
@@ -142,7 +133,7 @@ onMounted(() => {
         <!-- Links to Letter Section Toolbar -->
         <Toolbar class="border-0 mb-4 mt-20">
             <template #center>
-                <span v-for="(entries, letter) in glossary">
+                <span v-for="(entries, letter) in searchedGlossary">
                     <a :href="'#' + letter" v-if="entries.length > 0" class="mx-1 text-sky-600 hover:text-sky-900 underline">{{ letter }}</a>
                     <span v-else>...</span>
                 </span>
@@ -153,7 +144,7 @@ onMounted(() => {
         <div class="grid grid-cols-4">
             <!-- List of Terms and Definitions, Organized by Letter -->
             <div class="col-span-3">
-                <div v-for="(entries, letter) in glossary" >
+                <div v-for="(entries, letter) in searchedGlossary" >
                     <!-- Only show letter section if there are Glossary Entries that begin with that letter -->
                     <div v-if="entries.length > 0">
                         <h2 class="text-5xl font-semibold font-serif" :id="letter">{{ letter }}</h2>
@@ -179,7 +170,7 @@ onMounted(() => {
             <div class="col-span-1 ml-4">
                 <h2 class="text-xl border-b-2 sticky top-20 font-sans font-medium">Terms</h2>
                 <ScrollPanel class="sticky top-25 h-80-vh">
-                    <div v-for="(entries, letter) in glossary" class="my-2">
+                    <div v-for="(entries, letter) in searchedGlossary" class="my-2">
                         <div v-if="entries.length > 0">
                             <h3 class="font-serif">{{ letter }}</h3>
                             <ul class="leading-6">
