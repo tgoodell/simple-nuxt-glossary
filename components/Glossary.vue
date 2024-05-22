@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { FilterMatchMode } from 'primevue/api';
+import { onMounted } from 'vue';
 // Glossary with Definitions and Terms
     // Features:
         // Add term + definition
@@ -18,6 +19,7 @@ const popupVisible = ref(false)
 const newTerm = ref('')
 const newDefinition = ref('')
 const baseSortedTerms = ref<Record<string, GlossaryEntry[]>>({})
+const prevSectionExists = ref(false)
 
 interface GlossaryEntry {
     id: number
@@ -108,30 +110,63 @@ const onRowEditSave = async (event) => {
     getGlossary()
 };
 
-getGlossary()
-generateSortedTermsScaffold()
+onMounted(() => {
+    getGlossary()
+    generateSortedTermsScaffold()
+})
 </script>
 
 <template>
-    Glossary!
-    <div class="container px-4">
+    <div class="container mx-auto w-2/5 max-lg:w-auto">
+        <Toolbar class="mt-3 rounded-none sticky top-0">
+            <template #center>
+                <IconField iconPosition="left">
+                    <InputIcon>
+                        <i class="pi pi-search" />
+                    </InputIcon>
+                    <InputText placeholder="Search" />
+                </IconField>
+            </template>
+            <template #end>
+                <Button icon="pi pi-plus" severity="info" @click="popupVisible=true" />
+            </template>
+        </Toolbar>
+        <Toolbar class="border-0 mb-4">
+            <template #center>
+                <span v-for="(entries, letter) in glossary">
+                    <a :href="'#' + letter" v-if="entries.length > 0" class="mx-1 text-sky-600 hover:text-sky-900 underline">{{ letter }}</a>
+                    <span v-else>...</span>
+                </span>
+            </template>
+        </Toolbar>
         <div v-for="(entries, letter) in glossary">
             <!-- Only show letter section if there are Glossary Entries that begin with that letter -->
             <div v-if="entries.length > 0">
-                <h2 class="text-4xl font-medium" :id="letter">{{ letter }}</h2>
+                <h2 class="text-5xl font-semibold" :id="letter">{{ letter }}</h2>
                 <DataView :value="entries">
                     <template #list="slotProps">
-                        <div class="grid grid-nogutter bg-slate-50">
-                            <div v-for="(item, index) in slotProps.items" :key="index" class="col-12 leading-9">
-                                <h2 class="text-4xl font-medium">{{ item.term }}</h2>
+                        <div class="grid grid-nogutter">
+                            <div v-for="(item, index) in slotProps.items" :key="index" class="leading-7 my-2">
+                                <h2 class="text-2xl font-medium my-2">{{ item.term }}</h2>
                                 <p>{{ item.definition }}</p>
                             </div>
                         </div>
                     </template>
                 </DataView>
+                <hr class="my-4"/>
             </div>
         </div>
-        
+        <Dialog v-model:visible="popupVisible" modal header="Add Entry" :style="{ width: '25rem' }">
+            <span class="text-surface-600 dark:text-surface-0/70 block mb-5">Submit a new term and definition pair.</span>
+            <label for="term">Term</label>
+            <InputText v-model="newTerm" id="term" />
+            <label for="term">Definition</label>
+            <Textarea v-model="newDefinition" id="definition" />
+            <div class="flex justify-end gap-2">
+                <Button type="button" label="Cancel" severity="secondary" @click="popupVisible=false"></Button>
+                <Button type="button" label="Save" @click="addTerm(newTerm, newDefinition)"></Button>
+            </div>
+        </Dialog>
     </div>
 
 
@@ -139,7 +174,6 @@ generateSortedTermsScaffold()
         <InputText type="text" v-model="entry.term" disabled /><Textarea v-model="entry.definition" cols="40" autoResize disabled />
         <Button icon="pi pi-pencil" />
     </div> -->
-    {{config.public.apiBase }}
     <!-- <DataTable 
         :value="glossary" 
         :rows="10" 
@@ -183,16 +217,5 @@ generateSortedTermsScaffold()
             </template>
         </Column>
         <Column :rowEditor="true" bodyStyle="text-align:center"></Column>
-    </DataTable>
-    <Dialog v-model:visible="popupVisible" modal header="Add Entry" :style="{ width: '25rem' }">
-        <span class="text-surface-600 dark:text-surface-0/70 block mb-5">Submit a new term and definition pair.</span>
-        <label for="term">Term</label>
-        <InputText v-model="newTerm" id="term" />
-        <label for="term">Definition</label>
-        <Textarea v-model="newDefinition" id="definition" />
-        <div class="flex justify-end gap-2">
-            <Button type="button" label="Cancel" severity="secondary" @click="popupVisible=false"></Button>
-            <Button type="button" label="Save" @click="addTerm(newTerm, newDefinition)"></Button>
-        </div>
-    </Dialog> -->
+    </DataTable>-->
 </template>
