@@ -42,7 +42,7 @@ function generateSortedTermsScaffold(): void {
 
 // A function that turns a word into kebab case
 function slugify(word: String) {
-    return word.toLowerCase().replace(/\s+/g, '-')
+    return word.toLowerCase().replace(/\s+/g, '-').replace('/','-')
 }
 
 // A function to fetch the pre-existing glossary
@@ -134,7 +134,7 @@ onMounted(() => {
                 </IconField>
             </template>
             <template #end>
-                <Button icon="pi pi-plus" class="text-slate-100 bg-sky-400 hover:bg-sky-600" @click="popupVisible=true" />
+                <Button icon="pi pi-plus" class="text-slate-100 bg-sky-600 hover:bg-sky-900" @click="popupVisible=true" />
             </template>
         </Toolbar>
 
@@ -155,11 +155,11 @@ onMounted(() => {
                 <div v-for="(entries, letter) in glossary" >
                     <!-- Only show letter section if there are Glossary Entries that begin with that letter -->
                     <div v-if="entries.length > 0">
-                        <h2 class="text-5xl font-semibold" :id="letter">{{ letter }}</h2>
+                        <h2 class="text-5xl font-semibold font-serif" :id="letter">{{ letter }}</h2>
                         <DataView :value="entries">
                             <template #list="slotProps">
                                 <div class="grid grid-nogutter">
-                                    <div v-for="(item, index) in slotProps.items" :key="index" class="leading-7 my-2" :id="slugify(item.term)">
+                                    <div v-for="(item, index) in slotProps.items" :key="index" class="leading-7 my-2 font-sans" :id="slugify(item.term)">
                                         <h2 class="text-2xl font-medium my-2">{{ item.term }}</h2>
                                         <p>{{ item.definition }}</p>
                                     </div>
@@ -177,10 +177,10 @@ onMounted(() => {
                 <ScrollPanel class="sticky top-25 h-80-vh">
                     <div v-for="(entries, letter) in glossary" class="my-2">
                         <div v-if="entries.length > 0">
-                            <h3>{{ letter }}</h3>
+                            <h3 class="font-serif">{{ letter }}</h3>
                             <ul class="leading-6">
                                 <li v-for="entry in entries">
-                                    <a :href="'#' + slugify(entry.term)" class="text-sky-600 hover:text-sky-900 underline">
+                                    <a :href="'#' + slugify(entry.term)" class="text-sky-600 hover:text-sky-900 underline font-sans">
                                         {{ entry.term }}
                                     </a>
                                 </li>
