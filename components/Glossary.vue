@@ -40,6 +40,11 @@ function generateSortedTermsScaffold(): void {
     }
 }
 
+// A function that turns a word into kebab case
+function slugify(word: String) {
+    return word.toLowerCase().replace(/\s+/g, '-')
+}
+
 // A function to fetch the pre-existing glossary
 // Will also alphabetize and group together the terms
 async function getGlossary() {
@@ -117,7 +122,7 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="container mx-auto w-2/5 max-lg:w-auto">
+    <div class="container mx-auto w-1/2 max-lg:w-auto">
         <Toolbar class="mt-3 rounded-none sticky top-0">
             <template #center>
                 <IconField iconPosition="left">
@@ -139,23 +144,43 @@ onMounted(() => {
                 </span>
             </template>
         </Toolbar>
-        <div v-for="(entries, letter) in glossary">
-            <!-- Only show letter section if there are Glossary Entries that begin with that letter -->
-            <div v-if="entries.length > 0">
-                <h2 class="text-5xl font-semibold" :id="letter">{{ letter }}</h2>
-                <DataView :value="entries">
-                    <template #list="slotProps">
-                        <div class="grid grid-nogutter">
-                            <div v-for="(item, index) in slotProps.items" :key="index" class="leading-7 my-2">
-                                <h2 class="text-2xl font-medium my-2">{{ item.term }}</h2>
-                                <p>{{ item.definition }}</p>
-                            </div>
-                        </div>
-                    </template>
-                </DataView>
-                <hr class="my-4"/>
+        <div class="grid grid-cols-4">
+            <div class="col-span-3">
+                <div v-for="(entries, letter) in glossary" >
+                    <!-- Only show letter section if there are Glossary Entries that begin with that letter -->
+                    <div v-if="entries.length > 0">
+                        <h2 class="text-5xl font-semibold" :id="letter">{{ letter }}</h2>
+                        <DataView :value="entries">
+                            <template #list="slotProps">
+                                <div class="grid grid-nogutter">
+                                    <div v-for="(item, index) in slotProps.items" :key="index" class="leading-7 my-2" :id="slugify(item.term)">
+                                        <h2 class="text-2xl font-medium my-2">{{ item.term }}</h2>
+                                        <p>{{ item.definition }}</p>
+                                    </div>
+                                </div>
+                            </template>
+                        </DataView>
+                        <hr class="my-4"/>
+                    </div>
+                </div>
+            </div>
+            <div class="col-span-1">
+                <h2 class="text-xl">Terms</h2>
+                <div v-for="(entries, letter) in glossary" class="my-2">
+                    <div v-if="entries.length > 0">
+                        <h3>{{ letter }}</h3>
+                        <ul>
+                            <li v-for="entry in entries">
+                                <a :href="'#' + slugify(entry.term)" class="text-sky-600 hover:text-sky-900 underline">
+                                    {{ entry.term }}
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
             </div>
         </div>
+        
         <Dialog v-model:visible="popupVisible" modal header="Add Entry" :style="{ width: '25rem' }">
             <span class="text-surface-600 dark:text-surface-0/70 block mb-5">Submit a new term and definition pair.</span>
             <label for="term">Term</label>
