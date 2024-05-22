@@ -18,6 +18,12 @@ const popupVisible = ref(false)
 const newTerm = ref('')
 const newDefinition = ref('')
 
+interface GlossaryEntry {
+    id: number
+    term: String
+    definition: String
+}
+
 // A function that returns the full URL to use in an API call
 function fullUrl(suffix: string) {
     return config.public.apiBase + suffix
@@ -25,10 +31,15 @@ function fullUrl(suffix: string) {
 
 // A function to fetch the pre-existing glossary
 async function getGlossary() {
-  const data = await $fetch(fullUrl('api/glossary'), {
+  const data: GlossaryEntry[] = await $fetch(fullUrl('api/glossary'), {
     method: 'GET',
   })
-  glossary.value = data
+  // Transform data so it is in alphabetical order by term
+  glossary.value = data.sort((first: GlossaryEntry, second: GlossaryEntry) => {
+    if (first.term < second.term) return -1
+    if (first.term > second.term) return 1
+    return 0
+  })
 }
 
 // A function to add a new term given its id, term, and definition
