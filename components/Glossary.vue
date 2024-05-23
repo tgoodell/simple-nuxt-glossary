@@ -248,12 +248,12 @@ onMounted(() => {
                                         <!-- Edit Mode -->
                                         <div v-else>
                                             <div class="my-2">
-                                                <InputText id="term" v-model="editingEntry.term" class="text-2xl font-medium leading-8" />
+                                                <InputText id="term" v-model="editingEntry.term" class="text-2xl font-medium leading-8" size="small" />
                                                 <label for="term" hidden>Term</label>
                                                 <Button icon="pi pi-times" class="border-0 text-rose-400 hover:text-rose-700 h-12" @click="turnOffEditMode()" />
                                                 <Button icon="pi pi-check" class="border-0 text-green-600 hover:text-green-900 h-12" @click="saveEdits()" :disabled="invalidInput(editingEntry.term) || invalidInput(editingEntry.definition)"/>
                                             </div>
-                                            <Textarea id="definition" v-model="editingEntry.definition" class="w-full" />
+                                            <Textarea id="definition" v-model="editingEntry.definition" class="w-full"  size="small" />
                                             <label for="definition" hidden>definition</label>
                                         </div>
                                     </div>
