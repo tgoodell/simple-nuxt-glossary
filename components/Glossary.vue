@@ -66,16 +66,21 @@ function highlightSearchTerm(words: string) {
         const upperSquery = searchQuery.value.toUpperCase()
         const capitalSquery = lowerSquery.charAt(0).toUpperCase() + lowerSquery.slice(1)
 
-        const winnerSquery = ref('')
+        const winnerSquery = ref<string[]>([])
 
+        // We check all three cases because, theoretically, a definition could include all three
         // Case 1: All lowercase
-        if (words.includes(lowerSquery)) winnerSquery.value = lowerSquery
+        if (words.includes(lowerSquery)) winnerSquery.value.push(lowerSquery)
         // Case 2: Key term is uppercase
-        else if (words.includes(upperSquery)) winnerSquery.value = upperSquery
+        if (words.includes(upperSquery)) winnerSquery.value.push(upperSquery)
         // Case 3: Key term is capitalized
-        else if (words.includes(capitalSquery)) winnerSquery.value = capitalSquery
+        if (words.includes(capitalSquery)) winnerSquery.value.push(capitalSquery)
 
-        return words.replaceAll(winnerSquery.value, `<span class='bg-yellow-100'>${winnerSquery.value}</span>`)
+        const highlightedText = ref(words)
+        for (let i=0; i<winnerSquery.value.length; i++) {
+            highlightedText.value = highlightedText.value.replaceAll(winnerSquery.value[i], `<span class='bg-yellow-100'>${winnerSquery.value[i]}</span>`)
+        }
+        return highlightedText.value
     }
     return words
 }
