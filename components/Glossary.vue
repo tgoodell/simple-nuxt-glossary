@@ -19,7 +19,8 @@ interface GlossaryEntry {
 
 const config = useRuntimeConfig()
 const glossary = ref() // What is rendered
-const popupVisible = ref(false)
+const newPopupVisible = ref(false)
+const bulkPopupVisible = ref(false)
 const baseSortedTerms = ref<Record<string, GlossaryEntry[]>>({})
 const searchQuery = ref('')
 const orderedData = ref() // Raw ordered data
@@ -99,6 +100,7 @@ function turnOffEditMode() {
     editingEntry.value = {id: -1, term: '', definition: ''}
 }
 
+// A function that is called when the client wants to send edits to the server
 function saveEdits() {
     editTerm(editingEntry.value.id, editingEntry.value.term, editingEntry.value.definition)
     turnOffEditMode()
@@ -143,8 +145,8 @@ async function addTerm(term: string, definition: string) {
             definition: definition
         }
     })
-    if (popupVisible.value) {
-        popupVisible.value = false
+    if (newPopupVisible.value) {
+        newPopupVisible.value = false
     }
     getGlossary()
 }
@@ -176,8 +178,8 @@ onMounted(() => {
                 </IconField>
             </template>
             <template #end>
-                <Button icon="pi pi-file-arrow-up" class="text-slate-100 bg-sky-600 hover:bg-sky-900 mr-1" @click="" :disabled="inEditMode()" />
-                <Button icon="pi pi-plus" class="text-slate-100 bg-sky-600 hover:bg-sky-900" @click="popupVisible=true" :disabled="inEditMode()" />
+                <Button icon="pi pi-file-arrow-up" class="text-slate-100 bg-sky-600 hover:bg-sky-900 mr-1" @click="bulkPopupVisible = true" :disabled="inEditMode()" />
+                <Button icon="pi pi-plus" class="text-slate-100 bg-sky-600 hover:bg-sky-900" @click="newPopupVisible=true" :disabled="inEditMode()" />
             </template>
         </Toolbar>
 
@@ -255,14 +257,23 @@ onMounted(() => {
 
         <!-- Add Term Popup -->
         <!-- Since Primevue Dialog does not allow us pass a class, we must use an inline style -->
-        <Dialog v-model:visible="popupVisible" modal header="Add Entry" :style="{ width: '25rem' }">
+        <Dialog v-model:visible="newPopupVisible" modal header="Add Entry" :style="{ width: '25rem' }">
             <span class="text-surface-600 dark:text-surface-0/70 block mb-5">Submit a new term and definition pair.</span>
             <label for="term" class="block text-sm font-medium leading-6 text-gray-900">Term</label>
             <InputText v-model="editingEntry.term" id="term" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 mb-2" />
             <label for="term" class="block text-sm font-medium leading-6 text-gray-900">Definition</label>
             <Textarea v-model="editingEntry.definition" id="definition" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 mb-2" />
             <div class="flex justify-end gap-2 mt-4">
-                <Button type="button" label="Cancel" class="bg-stone-100 hover:bg-stone-200" @click="popupVisible=false"></Button>
+                <Button type="button" label="Cancel" class="bg-stone-100 hover:bg-stone-200" @click="newPopupVisible=false"></Button>
+                <Button type="button" label="Save" class="bg-sky-100 hover:bg-sky-200" @click="addTerm(editingEntry.term, editingEntry.definition)"></Button>
+            </div>
+        </Dialog>
+
+        <!-- Bulk Import Popup -->
+        <Dialog v-model:visible="bulkPopupVisible" modal header="Bulk Import" :style="{ width: '25rem' }">
+            <span class="text-surface-600 dark:text-surface-0/70 block mb-5">Upload a CSV file of term and definition pairs.</span>
+            <div class="flex justify-end gap-2 mt-4">
+                <Button type="button" label="Cancel" class="bg-stone-100 hover:bg-stone-200" @click="bulkPopupVisible = false"></Button>
                 <Button type="button" label="Save" class="bg-sky-100 hover:bg-sky-200" @click="addTerm(editingEntry.term, editingEntry.definition)"></Button>
             </div>
         </Dialog>
