@@ -110,15 +110,17 @@ function invalidInput(word: string) {
 
 const customBase64Uploader = async (event) => {
     const file = event.files[0];
-    console.log(event)
+    // console.log(event)
     const reader = new FileReader();
-    let blob = await fetch(file.objectURL).then((r) => r.blob()); //blob:url
-
-    reader.readAsDataURL(blob);
+    const blob = await new Promise((resolve) => {
+        reader.onload = () => resolve(reader.result);
+        reader.readAsDataURL(file);
+    });
+    // reader.readAsText(blob)
 
     reader.onloadend = async function () {
         const base64data = reader.result;
-        // console.log(base64data)
+        console.log(base64data)
         await $fetch(fullUrl('api/bulk-upload'), {
             method: 'POST',
             body: {

@@ -87,10 +87,13 @@ module.exports = [
             options: {
               middleware: (req, res, next, core) => { // Search for the user and remove it
                 // console.log(req.body.data)
-                const base64String = req.body.data.replace(/^data:text\/html;base64,/, '');
+                const base64String = req.body.data.split(',')[1];
+
+                // Decode Base64 string into raw binary data
                 const binaryData = atob(base64String);
-                const htmlContent = decodeURIComponent(escape(binaryData));
-                console.log(htmlContent)
+
+                console.log(binaryData)
+
                 res.status(200); // Created
                 res.send();
               },
