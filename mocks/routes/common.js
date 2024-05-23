@@ -92,7 +92,7 @@ module.exports = [
                     return prev.id > current.id ? prev : current
                   }
                 );
-                const nextId = lastEntry.id + 1
+                let nextId = lastEntry.id + 1
 
                 const base64String = req.body.data.split(',')[1]
                 const binaryData = atob(base64String);

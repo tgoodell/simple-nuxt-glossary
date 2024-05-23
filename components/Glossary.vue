@@ -113,6 +113,7 @@ function invalidInput(word: string) {
     return true
 }
 
+// The function that handles bulk upload via a csv file
 const bulkUploader = async (event) => {
     const file = event.files[0];
     // console.log(event)
@@ -133,7 +134,8 @@ const bulkUploader = async (event) => {
             }
         })
         getGlossary() // not sufficient
-    };    
+        // console.log(glossary)
+    };
 };
 
 // A function to fetch the pre-existing glossary
@@ -302,7 +304,7 @@ onMounted(() => {
         <!-- Bulk Import Popup -->
         <Dialog v-model:visible="bulkPopupVisible" modal header="Bulk Import" :style="{ 'max-width': '30rem' }">
             <span class="text-surface-600 dark:text-surface-0/70 block mb-5">Upload a CSV file of term and definition pairs.</span>
-            <FileUpload name="demo[]" url="fullUrl(/api/bulk-upload)" accept=".csv" :maxFileSize="1000000" @upload="bulkUploader" :multiple="false" />
+            <FileUpload name="demo[]" accept=".csv" :maxFileSize="1000000" @upload="bulkUploader" :multiple="false" />
             <div class="flex justify-end gap-2 mt-4">
                 <Button type="button" label="Close" class="bg-stone-100 hover:bg-stone-200" @click="bulkPopupVisible = false"></Button>
             </div>
