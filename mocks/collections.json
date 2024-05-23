@@ -1,6 +1,11 @@
 [
   {
     "id": "base",
-    "routes": ["get-terms:success", "edit-term:success", "add-term:success"]
+    "routes": [
+      "get-terms:success", 
+      "edit-term:success", 
+      "add-term:success", 
+      "bulk-upload:success"
+    ]
   }
 ]

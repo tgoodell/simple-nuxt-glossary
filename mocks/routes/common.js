@@ -75,5 +75,27 @@ module.exports = [
             },
         },
     ]
+  },
+  {
+    id: "bulk-upload", // route id
+    url: "/api/bulk-upload", // url in express format
+    method: "POST", // HTTP method
+    variants: [
+        {
+            id: "success", // variant id
+            type: "middleware", // variant handler id
+            options: {
+              middleware: (req, res, next, core) => { // Search for the user and remove it
+                // console.log(req.body.data)
+                const base64String = req.body.data.replace(/^data:text\/html;base64,/, '');
+                const binaryData = atob(base64String);
+                const htmlContent = decodeURIComponent(escape(binaryData));
+                console.log(htmlContent)
+                res.status(200); // Created
+                res.send();
+              },
+            },
+        },
+    ]
   }
 ];

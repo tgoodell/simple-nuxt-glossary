@@ -28,7 +28,8 @@ export default defineNuxtConfig({
         'Dialog', 
         'DataView' , 
         'Toolbar', 
-        'ScrollPanel'
+        'ScrollPanel',
+        'FileUpload'
       ]
     },
     importPT: { as: 'Aura', from: '~/presets/aura' }
