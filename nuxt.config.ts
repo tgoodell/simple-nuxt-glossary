@@ -19,7 +19,7 @@ export default defineNuxtConfig({
       unstyled: true
     },
     components: {
-      include: ['Button', 'Textarea', 'InputText', 'Column', 'IconField', 'InputIcon', 'Card', 'Dialog', 'DataView' , 'Toolbar', 'ScrollPanel']
+      include: ['Button', 'Textarea', 'InputText', 'Column', 'IconField', 'InputIcon', 'Card', 'Dialog', 'DataView' , 'Toolbar', 'ScrollPanel', 'FloatLabel']
     },
     importPT: { as: 'Aura', from: '~/presets/aura' }
   },

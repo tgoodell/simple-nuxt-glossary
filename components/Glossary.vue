@@ -11,20 +11,20 @@ import { onMounted } from 'vue';
         // $fetch it
         // Probably best to just use a Data Table to render terms + definitions
 
-const config = useRuntimeConfig()
-const glossary = ref() // What is rendered
-const popupVisible = ref(false)
-const newTerm = ref('')
-const newDefinition = ref('')
-const baseSortedTerms = ref<Record<string, GlossaryEntry[]>>({})
-const searchQuery = ref('')
-const orderedData = ref() // Raw ordered data
-
 interface GlossaryEntry {
     id: number
     term: String
-    definition: String
+    definition: String,
 }
+
+const config = useRuntimeConfig()
+const glossary = ref() // What is rendered
+const popupVisible = ref(false)
+const baseSortedTerms = ref<Record<string, GlossaryEntry[]>>({})
+const searchQuery = ref('')
+const orderedData = ref() // Raw ordered data
+const editingEntry = ref<GlossaryEntry>({id: -1, term: '', definition: ''})
+
 
 // A function that returns the full URL to use in an API call
 function fullUrl(suffix: string) {
@@ -84,6 +84,26 @@ function highlightSearchTerm(words: String) {
     return words
 }
 
+// A function that advises whether we are in edit more or not
+function inEditMode() {
+    return editingEntry.value.id !== -1
+}
+
+// A function to turn on edit mode for a term + definition
+function turnOnEditMode(entry: GlossaryEntry) {
+    editingEntry.value = JSON.parse(JSON.stringify(entry))
+}
+
+// A function to turn off edit mode for a term + definition
+function turnOffEditMode() {
+    editingEntry.value = {id: -1, term: '', definition: ''}
+}
+
+function saveEdits() {
+    editTerm(editingEntry.value.id, editingEntry.value.term, editingEntry.value.definition)
+    turnOffEditMode()
+}
+
 // A function to fetch the pre-existing glossary
 // Will also alphabetize and group together the terms
 async function getGlossary() {
@@ -110,6 +130,7 @@ async function editTerm(id: number, term: string, definition: string) {
             definition: definition
         }
     })
+    getGlossary()
 }
 
 // A function add a new term + definition, given a term and definition
@@ -151,12 +172,12 @@ onMounted(() => {
                     <InputIcon>
                         <i class="pi pi-search" />
                     </InputIcon>
-                    <InputText placeholder="Search" v-model="searchQuery" />
+                    <InputText placeholder="Search" v-model="searchQuery" :disabled="inEditMode()"/>
                 </IconField>
             </template>
             <template #end>
-                <Button icon="pi pi-file-arrow-up" class="text-slate-100 bg-sky-600 hover:bg-sky-900 mr-1" @click="" />
-                <Button icon="pi pi-plus" class="text-slate-100 bg-sky-600 hover:bg-sky-900" @click="popupVisible=true" />
+                <Button icon="pi pi-file-arrow-up" class="text-slate-100 bg-sky-600 hover:bg-sky-900 mr-1" @click="" :disabled="inEditMode()" />
+                <Button icon="pi pi-plus" class="text-slate-100 bg-sky-600 hover:bg-sky-900" @click="popupVisible=true" :disabled="inEditMode()" />
             </template>
         </Toolbar>
 
@@ -182,11 +203,27 @@ onMounted(() => {
                             <template #list="slotProps">
                                 <div class="grid grid-nogutter">
                                     <div v-for="(item, index) in slotProps.items" :key="index" class="leading-7 my-2 font-sans" :id="slugify(item.term)">
-                                        <h2 class="text-2xl font-medium my-2">
-                                            <span v-html="highlightSearchTerm(item.term)"></span>
-                                            <Button icon="pi pi-pencil" class="border-0 text-slate-300" size="small"/>
-                                        </h2>
-                                        <p v-html="highlightSearchTerm(item.definition)"></p>
+                                        <!-- Normal Output -->
+                                        <div v-if="editingEntry.id != item.id">
+                                            <h2 class="text-2xl font-medium my-2">
+                                                <span v-html="highlightSearchTerm(item.term)"></span>
+                                                <Button v-if="!inEditMode()" icon="pi pi-pencil" class="border-0 text-slate-300" size="small" @click="turnOnEditMode(item)" />
+                                            </h2>
+                                            <p v-html="highlightSearchTerm(item.definition)"></p>
+                                        </div>
+
+                                        <!-- Edit Mode -->
+                                        <div v-else>
+                                            <div class="my-2">
+                                                <InputText id="term" v-model="editingEntry.term" class="text-2xl font-medium leading-8" />
+                                                <label for="term" hidden>Term</label>
+                                                <Button icon="pi pi-times" class="border-0 text-rose-400 hover:text-rose-700 h-12" @click="turnOffEditMode()" />
+                                                <Button icon="pi pi-check" class="border-0 text-green-600 hover:text-green-900 h-12" @click="saveEdits()" />
+                                            </div>
+                                            <Textarea id="definition" v-model="editingEntry.definition" class="w-full" />
+                                            <label for="definition" hidden>definition</label>
+                                            
+                                        </div>
                                     </div>
                                 </div>
                             </template>
@@ -221,12 +258,12 @@ onMounted(() => {
         <Dialog v-model:visible="popupVisible" modal header="Add Entry" :style="{ width: '25rem' }">
             <span class="text-surface-600 dark:text-surface-0/70 block mb-5">Submit a new term and definition pair.</span>
             <label for="term" class="block text-sm font-medium leading-6 text-gray-900">Term</label>
-            <InputText v-model="newTerm" id="term" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 mb-2" />
+            <InputText v-model="editingEntry.term" id="term" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 mb-2" />
             <label for="term" class="block text-sm font-medium leading-6 text-gray-900">Definition</label>
-            <Textarea v-model="newDefinition" id="definition" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 mb-2" />
+            <Textarea v-model="editingEntry.definition" id="definition" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 mb-2" />
             <div class="flex justify-end gap-2 mt-4">
                 <Button type="button" label="Cancel" class="bg-stone-100 hover:bg-stone-200" @click="popupVisible=false"></Button>
-                <Button type="button" label="Save" class="bg-sky-100 hover:bg-sky-200" @click="addTerm(newTerm, newDefinition)"></Button>
+                <Button type="button" label="Save" class="bg-sky-100 hover:bg-sky-200" @click="addTerm(editingEntry.term, editingEntry.definition)"></Button>
             </div>
         </Dialog>
     </div>
