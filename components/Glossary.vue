@@ -37,7 +37,7 @@ function generateSortedTermsScaffold(): void {
 
 // A function that turns a word into kebab case
 function slugify(word: string) {
-    return word.toLowerCase().replace(/\s+/g, '-').replace('/','-')
+    return word.toLowerCase().replaceAll(/\s+/g, '-').replaceAll('/','-')
 }
 
 // A function that alphabetizes an array of GlossaryEntry
@@ -75,7 +75,7 @@ function highlightSearchTerm(words: string) {
         // Case 3: Key term is capitalized
         else if (words.includes(capitalSquery)) winnerSquery.value = capitalSquery
 
-        return words.replace(winnerSquery.value, `<span class='bg-yellow-100'>${winnerSquery.value}</span>`)
+        return words.replaceAll(winnerSquery.value, `<span class='bg-yellow-100'>${winnerSquery.value}</span>`)
     }
     return words
 }
@@ -108,7 +108,7 @@ function invalidInput(word: string) {
     return true
 }
 
-const customBase64Uploader = async (event) => {
+const bulkUploader = async (event) => {
     const file = event.files[0];
     // console.log(event)
     const reader = new FileReader();
@@ -127,6 +127,7 @@ const customBase64Uploader = async (event) => {
                 data: base64data
             }
         })
+        getGlossary() // not sufficient
     };    
 };
 
@@ -295,7 +296,7 @@ onMounted(() => {
         <!-- Bulk Import Popup -->
         <Dialog v-model:visible="bulkPopupVisible" modal header="Bulk Import" :style="{ 'max-width': '30rem' }">
             <span class="text-surface-600 dark:text-surface-0/70 block mb-5">Upload a CSV file of term and definition pairs.</span>
-            <FileUpload name="demo[]" url="fullUrl(/api/bulk-upload)" accept=".csv" :maxFileSize="1000000" @upload="customBase64Uploader" :multiple="false" />
+            <FileUpload name="demo[]" url="fullUrl(/api/bulk-upload)" accept=".csv" :maxFileSize="1000000" @upload="bulkUploader" :multiple="false" />
             <div class="flex justify-end gap-2 mt-4">
                 <Button type="button" label="Close" class="bg-stone-100 hover:bg-stone-200" @click="bulkPopupVisible = false"></Button>
             </div>

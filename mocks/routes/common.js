@@ -69,8 +69,8 @@ module.exports = [
                   definition: req.body.definition
                 }
                 console.log(definitions[nextId])
-                res.status(201); // Created
-                res.send();
+                res.status(201) // Created
+                res.send()
               },
             },
         },
@@ -86,16 +86,32 @@ module.exports = [
             type: "middleware", // variant handler id
             options: {
               middleware: (req, res, next, core) => { // Search for the user and remove it
-                // console.log(req.body.data)
-                const base64String = req.body.data.split(',')[1];
+                // Find the next id to use
+                const lastEntry = definitions.reduce(
+                  (prev, current) => {
+                    return prev.id > current.id ? prev : current
+                  }
+                );
+                const nextId = lastEntry.id + 1
 
-                // Decode Base64 string into raw binary data
+                const base64String = req.body.data.split(',')[1]
                 const binaryData = atob(base64String);
+                const csvImport = binaryData.split('\n')
+                for (var i=0; i<csvImport.length; i++) {
+                  const pair = csvImport[i].split(',').map(entry => entry = entry.replaceAll('"',''))
+                  // We only care if there is a valid pair
+                  if (pair.length == 2) {
+                    definitions[nextId] = {
+                      id: nextId,
+                      term: pair[0],
+                      definition: pair[1]
+                    }
+                  }
+                  nextId++
+                }
 
-                console.log(binaryData)
-
-                res.status(200); // Created
-                res.send();
+                res.status(200) // Created
+                res.send()
               },
             },
         },
