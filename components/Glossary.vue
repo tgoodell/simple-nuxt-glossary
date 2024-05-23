@@ -101,6 +101,13 @@ function saveEdits() {
     turnOffEditMode()
 }
 
+// A function that evaluates whether an input to a field is valid or not
+// In this case, it checks to make sure the length of the input is greater than 0 and less than 2056
+function invalidInput(word: string) {
+    if (word.length > 0 && word.length < 2056) return false
+    return true
+}
+
 const customBase64Uploader = async (event) => {
     const file = event.files[0];
     console.log(event)
@@ -235,11 +242,10 @@ onMounted(() => {
                                                 <InputText id="term" v-model="editingEntry.term" class="text-2xl font-medium leading-8" />
                                                 <label for="term" hidden>Term</label>
                                                 <Button icon="pi pi-times" class="border-0 text-rose-400 hover:text-rose-700 h-12" @click="turnOffEditMode()" />
-                                                <Button icon="pi pi-check" class="border-0 text-green-600 hover:text-green-900 h-12" @click="saveEdits()" />
+                                                <Button icon="pi pi-check" class="border-0 text-green-600 hover:text-green-900 h-12" @click="saveEdits()" :disabled="invalidInput(editingEntry.term) || invalidInput(editingEntry.definition)"/>
                                             </div>
                                             <Textarea id="definition" v-model="editingEntry.definition" class="w-full" />
                                             <label for="definition" hidden>definition</label>
-                                            
                                         </div>
                                     </div>
                                 </div>
@@ -275,12 +281,12 @@ onMounted(() => {
         <Dialog v-model:visible="newPopupVisible" modal header="Add Entry" :style="{ 'max-width': '25rem' }">
             <span class="text-surface-600 dark:text-surface-0/70 block mb-5">Submit a new term and definition pair.</span>
             <label for="term" class="block text-sm font-medium leading-6 text-gray-900">Term</label>
-            <InputText v-model="editingEntry.term" id="term" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 mb-2" />
+            <InputText v-model="editingEntry.term" id="term" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 mb-2" :invalid="invalidInput(editingEntry.term)" />
             <label for="term" class="block text-sm font-medium leading-6 text-gray-900">Definition</label>
-            <Textarea v-model="editingEntry.definition" id="definition" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 mb-2" />
+            <Textarea v-model="editingEntry.definition" id="definition" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 mb-2" :invalid="invalidInput(editingEntry.definition)" />
             <div class="flex justify-end gap-2 mt-4">
                 <Button type="button" label="Cancel" class="bg-stone-100 hover:bg-stone-200" @click="newPopupVisible=false"></Button>
-                <Button type="button" label="Save" class="bg-sky-100 hover:bg-sky-200" @click="addTerm(editingEntry.term, editingEntry.definition)"></Button>
+                <Button type="button" label="Save" class="bg-sky-100 hover:bg-sky-200" @click="addTerm(editingEntry.term, editingEntry.definition)" :disabled="invalidInput(editingEntry.term) || invalidInput(editingEntry.definition)" />
             </div>
         </Dialog>
 
@@ -289,8 +295,7 @@ onMounted(() => {
             <span class="text-surface-600 dark:text-surface-0/70 block mb-5">Upload a CSV file of term and definition pairs.</span>
             <FileUpload name="demo[]" url="fullUrl(/api/bulk-upload)" accept=".csv" :maxFileSize="1000000" @upload="customBase64Uploader" :multiple="false" />
             <div class="flex justify-end gap-2 mt-4">
-                <Button type="button" label="Cancel" class="bg-stone-100 hover:bg-stone-200" @click="bulkPopupVisible = false"></Button>
-                <Button type="button" label="Save" class="bg-sky-100 hover:bg-sky-200" @click="addTerm(editingEntry.term, editingEntry.definition)"></Button>
+                <Button type="button" label="Close" class="bg-stone-100 hover:bg-stone-200" @click="bulkPopupVisible = false"></Button>
             </div>
         </Dialog>
     </div>
