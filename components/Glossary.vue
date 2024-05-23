@@ -12,13 +12,13 @@ import { onMounted } from 'vue';
         // Probably best to just use a Data Table to render terms + definitions
 
 const config = useRuntimeConfig()
-const glossary = ref()
-const searchedGlossary = ref()
+const glossary = ref() // What is rendered
 const popupVisible = ref(false)
 const newTerm = ref('')
 const newDefinition = ref('')
 const baseSortedTerms = ref<Record<string, GlossaryEntry[]>>({})
 const searchQuery = ref('')
+const orderedData = ref() // Raw ordered data
 
 interface GlossaryEntry {
     id: number
@@ -44,6 +44,46 @@ function slugify(word: String) {
     return word.toLowerCase().replace(/\s+/g, '-').replace('/','-')
 }
 
+// A function that alphabetizes an array of GlossaryEntry
+function alphabetizeArray(arr: GlossaryEntry[]) {
+    return arr.sort((first: GlossaryEntry, second: GlossaryEntry) => {
+        if (first.term < second.term) return -1
+        if (first.term > second.term) return 1
+        return 0
+    })
+}
+
+// A function that organizes an array by starting letter into an Object
+function groupByLetter(arr: GlossaryEntry[]) {
+    const sortedTerms = ref(JSON.parse(JSON.stringify(baseSortedTerms.value)))
+    for (const entry of arr) {
+        sortedTerms.value[entry.term.charAt(0)].push(entry)
+    }
+    return sortedTerms.value
+}
+
+// A function that highlights text that matches the search query
+function highlightSearchTerm(words: String) {
+    if (searchQuery.value !== '') {
+        // Transform Search Query to possible matches
+        const lowerSquery = searchQuery.value.toLowerCase()
+        const upperSquery = searchQuery.value.toUpperCase()
+        const capitalSquery = lowerSquery.charAt(0).toUpperCase() + lowerSquery.slice(1)
+
+        const winnerSquery = ref('')
+
+        // Case 1: All lowercase
+        if (words.includes(lowerSquery)) winnerSquery.value = lowerSquery
+        // Case 2: Key term is uppercase
+        else if (words.includes(upperSquery)) winnerSquery.value = upperSquery
+        // Case 3: Key term is capitalized
+        else if (words.includes(capitalSquery)) winnerSquery.value = capitalSquery
+
+        return words.replace(winnerSquery.value, `<span class='bg-yellow-100'>${winnerSquery.value}</span>`)
+    }
+    return words
+}
+
 // A function to fetch the pre-existing glossary
 // Will also alphabetize and group together the terms
 async function getGlossary() {
@@ -51,22 +91,11 @@ async function getGlossary() {
         method: 'GET',
     })
     // Step 1: Sort all terms
-    const orderedData = ref()
     // Transform data so it is in alphabetical order by term
-    orderedData.value = data.sort((first: GlossaryEntry, second: GlossaryEntry) => {
-        if (first.term < second.term) return -1
-        if (first.term > second.term) return 1
-        return 0
-    })
+    orderedData.value = alphabetizeArray(data) // Never change this
 
     // Step 2: Group all terms together by starting letter
-    const sortedTerms = ref(JSON.parse(JSON.stringify(baseSortedTerms.value)))
-    for (const entry of orderedData.value) {
-        sortedTerms.value[entry.term.charAt(0)].push(entry)
-    }
-
-    glossary.value = sortedTerms.value
-    searchedGlossary.value = sortedTerms.value
+    glossary.value = groupByLetter(orderedData.value)
 }
 
 // A function to add a new term given its id, term, and definition
@@ -101,9 +130,10 @@ async function addTerm(term: string, definition: string) {
 
 // When searchQuery changes, update the searchedGlossary
 watch(searchQuery, async() => {
-    console.log(searchQuery.value)
-    searchedGlossary.value = glossary.value
-    console.log(glossary.value)
+    glossary.value = groupByLetter(orderedData.value.filter((entry: GlossaryEntry) => 
+        entry.term.toLowerCase().includes(searchQuery.value.toLowerCase()) || 
+        entry.definition.toLowerCase().includes(searchQuery.value.toLowerCase()))
+    )
 })
 
 onMounted(() => {
@@ -133,7 +163,7 @@ onMounted(() => {
         <!-- Links to Letter Section Toolbar -->
         <Toolbar class="border-0 mb-4 mt-20">
             <template #center>
-                <span v-for="(entries, letter) in searchedGlossary">
+                <span v-for="(entries, letter) in glossary">
                     <a :href="'#' + letter" v-if="entries.length > 0" class="mx-1 text-sky-600 hover:text-sky-900 underline">{{ letter }}</a>
                     <span v-else>...</span>
                 </span>
@@ -144,7 +174,7 @@ onMounted(() => {
         <div class="grid grid-cols-4">
             <!-- List of Terms and Definitions, Organized by Letter -->
             <div class="col-span-3">
-                <div v-for="(entries, letter) in searchedGlossary" >
+                <div v-for="(entries, letter) in glossary" >
                     <!-- Only show letter section if there are Glossary Entries that begin with that letter -->
                     <div v-if="entries.length > 0">
                         <h2 class="text-5xl font-semibold font-serif" :id="letter">{{ letter }}</h2>
@@ -153,10 +183,10 @@ onMounted(() => {
                                 <div class="grid grid-nogutter">
                                     <div v-for="(item, index) in slotProps.items" :key="index" class="leading-7 my-2 font-sans" :id="slugify(item.term)">
                                         <h2 class="text-2xl font-medium my-2">
-                                            {{ item.term }}
+                                            <span v-html="highlightSearchTerm(item.term)"></span>
                                             <Button icon="pi pi-pencil" class="border-0 text-slate-300" size="small"/>
                                         </h2>
-                                        <p>{{ item.definition }}</p>
+                                        <p v-html="highlightSearchTerm(item.definition)"></p>
                                     </div>
                                 </div>
                             </template>
@@ -170,7 +200,7 @@ onMounted(() => {
             <div class="col-span-1 ml-4">
                 <h2 class="text-xl border-b-2 sticky top-20 font-sans font-medium">Terms</h2>
                 <ScrollPanel class="sticky top-25 h-80-vh">
-                    <div v-for="(entries, letter) in searchedGlossary" class="my-2">
+                    <div v-for="(entries, letter) in glossary" class="my-2">
                         <div v-if="entries.length > 0">
                             <h3 class="font-serif">{{ letter }}</h3>
                             <ul class="leading-6">
