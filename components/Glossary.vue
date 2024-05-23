@@ -14,13 +14,13 @@ interface GlossaryEntry {
 }
 
 const config = useRuntimeConfig()
-const glossary = ref() // What is rendered
-const newPopupVisible = ref(false)
-const bulkPopupVisible = ref(false)
-const baseSortedTerms = ref<Record<string, GlossaryEntry[]>>({})
-const searchQuery = ref('')
+const glossary = ref<Record<string, GlossaryEntry[]>>({}) // The local glossary rendered on the page
+const newPopupVisible = ref(false) // Whether the Add Entry popup is visible
+const bulkPopupVisible = ref(false) // Whether the Bulk Import popup is visible
+const baseSortedTerms = ref<Record<string, GlossaryEntry[]>>({}) // The scaffolding format for glossary
+const searchQuery = ref('') // The Search Query modified by the search bar
 const orderedData = ref() // Raw ordered data
-const editingEntry = ref<GlossaryEntry>({id: -1, term: '', definition: ''})
+const editingEntry = ref<GlossaryEntry>({id: -1, term: '', definition: ''}) // The entry that is currently being edited
 
 // A function that returns the full URL to use in an API call
 function fullUrl(suffix: string) {
@@ -189,9 +189,10 @@ watch(searchQuery, async() => {
     )
 })
 
+// Functions to call on mount
 onMounted(() => {
-    getGlossary()
-    generateSortedTermsScaffold()
+    generateSortedTermsScaffold() // Generate the object that groups entries by starting letter
+    getGlossary() // Populate local glossary
 })
 </script>
 
