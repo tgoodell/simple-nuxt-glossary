@@ -122,7 +122,6 @@ const bulkUploader = async (event) => {
         reader.onload = () => resolve(reader.result);
         reader.readAsDataURL(file);
     });
-    // reader.readAsText(blob)
 
     reader.onloadend = async function () {
         const base64data = reader.result;
@@ -134,7 +133,6 @@ const bulkUploader = async (event) => {
             }
         })
         getGlossary() // not sufficient
-        // console.log(glossary)
     };
 };
 
@@ -201,7 +199,7 @@ onMounted(() => {
 <template>
     <div class="container mx-auto w-1/2 max-lg:w-auto">
         <!-- Search + Add Term Bar -->
-        <Toolbar class="mt-3 rounded-none fixed top-0 w-1/2">
+        <Toolbar class="mt-3 rounded-none fixed top-0 w-1/2 z-50">
             <template #center>
                 <IconField iconPosition="left">
                     <InputIcon>
