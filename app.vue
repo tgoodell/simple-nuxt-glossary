@@ -3,5 +3,5 @@ import 'primeicons/primeicons.css'
 </script>
 
 <template>
-  <Glossary />
+  <NuxtPage />
 </template>

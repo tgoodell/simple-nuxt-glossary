@@ -7,11 +7,7 @@ import { onMounted } from 'vue';
         // Bulk import
         // Search
 
-interface GlossaryEntry {
-    id: number
-    term: string
-    definition: string,
-}
+
 
 const config = useRuntimeConfig()
 const glossary = ref<Record<string, GlossaryEntry[]>>({}) // The local glossary rendered on the page
