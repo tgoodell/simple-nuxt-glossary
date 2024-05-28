@@ -6,7 +6,6 @@ const { data, error, pending, refresh } = await useGlossaryApi('api/glossary', {
   },
 })
 
-
 /**
  * Computes and returns organized data based on the provided data.
  * If there is an error, an empty object is returned.
@@ -41,12 +40,13 @@ function alphabetizeArray(arr: GlossaryEntry[]) {
     })
 }
 
+const config = useRuntimeConfig()
 // A function that returns the full URL to use in an API call
 function fullUrl(suffix: string) {
     return config.public.apiBase + suffix
 }
 
-const newPopupVisible = ref(false)
+const addPopupVisible = ref(false)
 // A function add a new term + definition, given a term and definition
 // The backend will handle assigning an id
 async function addTerm(term: string, definition: string) {
@@ -57,21 +57,25 @@ async function addTerm(term: string, definition: string) {
             definition: definition
         }
     })
-    if (newPopupVisible.value) {
-        newPopupVisible.value = false
+    if (addPopupVisible.value) {
+        addPopupVisible.value = false
     }
+    refresh()
 }
+
+const editingEntry = ref<GlossaryEntry>({id: -1, term: '', definition: ''}) // The entry that is currently being edited
+const bulkPopupVisible = ref(false)
 </script>
 
 <template>
   <div class="container mx-auto w-1/2 max-lg:w-auto">
-    <GlossarySearch v-model="search" />
+    <GlossarySearch v-model:search="search" v-model:addPopupVisible="addPopupVisible" v-model:bulkPopupVisible="bulkPopupVisible"/>
     <GlossaryLetterLinks :data="organizedData" />
     <div class="grid grid-cols-4">
         <GlossaryContent :data="organizedData" :search="search" />
         <GlossarySidebar :data="organizedData" />
     </div>
-    <GlossaryDialogAdd :isVisible="newPopupVisible" />
+    <GlossaryDialogAdd v-model:isVisible="addPopupVisible" :addTerm="addTerm" />
     
     <!-- GlossarySideBar -->
     <!-- Where do the dialogs go? -->
