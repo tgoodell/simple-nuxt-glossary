@@ -28,17 +28,17 @@ const organizedData = computed(() => {
         }
     }
 
+    // Sort the data so that it is in alphabetical order
+    const usedLetters = Object.keys(organized)
+    usedLetters.sort()
+    usedLetters.forEach((key, index) => {
+        const value = organized[key]
+        delete organized[key]
+        organized[key] = value
+    })
+
     return organized
 })
-
-// A function that alphabetizes an array of GlossaryEntry
-function alphabetizeArray(arr: GlossaryEntry[]) {
-    return arr.sort((first: GlossaryEntry, second: GlossaryEntry) => {
-        if (first.term < second.term) return -1
-        if (first.term > second.term) return 1
-        return 0
-    })
-}
 
 const config = useRuntimeConfig()
 // A function that returns the full URL to use in an API call
@@ -76,8 +76,5 @@ const bulkPopupVisible = ref(false)
         <GlossarySidebar :data="organizedData" />
     </div>
     <GlossaryDialogAdd v-model:isVisible="addPopupVisible" :addTerm="addTerm" />
-    
-    <!-- GlossarySideBar -->
-    <!-- Where do the dialogs go? -->
   </div>
 </template>
