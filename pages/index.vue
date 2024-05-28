@@ -41,14 +41,24 @@ const organizedData = computed(() => {
 })
 
 const config = useRuntimeConfig()
-// A function that returns the full URL to use in an API call
+
+/**
+ * Computes the full URL that an API call should use given a suffix using the apiBase in Nuxt Config
+ * 
+ * @returns {string} The Full URL
+ */
 function fullUrl(suffix: string) {
     return config.public.apiBase + suffix
 }
 
 const addPopupVisible = ref(false)
-// A function add a new term + definition, given a term and definition
-// The backend will handle assigning an id
+
+/**
+ * Add a new term + definition pair to the data on the backend.
+ * Also handles the visibility of the addPopup and calls a refresh of the data once the $fetch is complete.
+ * @param {string} term
+ * @param {string} definition
+ */
 async function addTerm(term: string, definition: string) {
     await $fetch(fullUrl('api/add'), {
         method: 'POST',
@@ -63,8 +73,45 @@ async function addTerm(term: string, definition: string) {
     refresh()
 }
 
-const editingEntry = ref<GlossaryEntry>({id: -1, term: '', definition: ''}) // The entry that is currently being edited
+const showSuccess = ref(false)
+// The function that handles bulk upload via a csv file
+/**
+ * Upload a csv file to the backend.
+ * The file is grabbed from the event, then encoded into base64 via blob, and finally uploaded.
+ * This function also handles the visibility of the showSuccess message and calls a refresh of the data.
+ * @param {event} event
+ */
+async function bulkUploader (event) {
+    const file = event.files[0];
+    const reader = new FileReader();
+    const blob = await new Promise((resolve) => {
+        reader.onload = () => resolve(reader.result);
+        reader.readAsDataURL(file);
+    });
+
+    reader.onloadend = async function () {
+        const base64data = reader.result;
+        await $fetch(fullUrl('api/bulk-upload'), {
+            method: 'POST',
+            body: {
+                data: base64data
+            }
+        })
+        showSuccess.value = true
+        refresh()
+    };
+};
+
 const bulkPopupVisible = ref(false)
+/**
+ * Watches bulkPopupVisible and ties it to the visibility of the bulkPopup.
+ * When !bulkPopupVisibility, we reset the value of showSuccess for the next bulk upload
+ */
+watch(bulkPopupVisible, async() => {
+    if (!bulkPopupVisible) showSuccess.value = false
+})
+
+const editingEntry = ref<GlossaryEntry>({id: -1, term: '', definition: ''}) // The entry that is currently being edited
 </script>
 
 <template>
@@ -76,5 +123,6 @@ const bulkPopupVisible = ref(false)
         <GlossarySidebar :data="organizedData" />
     </div>
     <GlossaryDialogAdd v-model:isVisible="addPopupVisible" :addTerm="addTerm" />
+    <GlossaryDialogUpload v-model:isVisible="bulkPopupVisible" :bulkUploader="bulkUploader" :showSuccess = "showSuccess" />
   </div>
 </template>

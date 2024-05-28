@@ -111,7 +111,6 @@ module.exports = [
               },
             )
             let nextId = lastEntry.id + 1
-
             const base64String = req.body.data.split(',')[1]
             const binaryData = atob(base64String)
             const csvImport = binaryData.split('\n')
