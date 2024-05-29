@@ -108,7 +108,7 @@ const bulkPopupVisible = ref(false)
  * When !bulkPopupVisibility, we reset the value of showSuccess for the next bulk upload
  */
 watch(bulkPopupVisible, async() => {
-    if (!bulkPopupVisible) showSuccess.value = false
+    if (showSuccess) showSuccess.value = false
 })
 
 const editingEntry = ref<GlossaryEntry>({id: -1, term: '', definition: ''}) // The entry that is currently being edited
