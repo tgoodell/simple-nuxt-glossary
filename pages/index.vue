@@ -74,7 +74,7 @@ async function addTerm(term: string, definition: string) {
 }
 
 const showSuccess = ref(false)
-// The function that handles bulk upload via a csv file
+
 /**
  * Upload a csv file to the backend.
  * The file is grabbed from the event, then encoded into base64 via blob, and finally uploaded.
@@ -102,6 +102,26 @@ async function bulkUploader (event) {
     };
 };
 
+/**
+ * Add a new term given its id, term, and definition.
+ * If the id belongs to a current entry, that entry will be edited.
+ * Otherwise, it will return a 404 status.
+ * @param {number} id
+ * @param {string} term
+ * @param {string} definition
+ */
+async function editTerm(id: number, term: string, definition: string) {
+    await $fetch(fullUrl('api/glossary'), {
+        method: 'POST',
+        body: {
+            id: id,
+            term: term,
+            definition: definition
+        }
+    })
+    refresh()
+}
+
 const bulkPopupVisible = ref(false)
 /**
  * Watches bulkPopupVisible and ties it to the visibility of the bulkPopup.
@@ -119,7 +139,7 @@ const editingEntry = ref<GlossaryEntry>({id: -1, term: '', definition: ''}) // T
     <GlossarySearch v-model:search="search" v-model:addPopupVisible="addPopupVisible" v-model:bulkPopupVisible="bulkPopupVisible"/>
     <GlossaryLetterLinks :data="organizedData" />
     <div class="grid grid-cols-4">
-        <GlossaryContent :data="organizedData" :search="search" />
+        <GlossaryContent :data="organizedData" :search="search" :editTerm="editTerm"/>
         <GlossarySidebar :data="organizedData" />
     </div>
     <GlossaryDialogAdd v-model:isVisible="addPopupVisible" :addTerm="addTerm" />
